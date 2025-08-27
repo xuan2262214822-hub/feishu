@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>汽车研发工作台 | AutoTech Innovation Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  
+  <!-- 配置Tailwind自定义主题 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#0F3460',      // 深蓝主色调
+            secondary: '#1A73E8',    // 亮蓝辅助色
+            accent: '#E63946',       // 红色强调色
+            metallic: '#C5C5C5',     // 金属银灰色
+            dark: '#161A30',         // 深色背景
+            light: '#F5F7FA',        // 浅色背景
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .text-shadow {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+      .card-hover:hover {
+        transform: translateY(-5px);
+      }
+      .gradient-mask {
+        mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+      }
+      .dashboard-glass {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+      .car-line {
+        stroke-dasharray: 1000;
+        stroke-dashoffset: 1000;
+        animation: dash 3s linear forwards;
+      }
+      @keyframes dash {
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
+      .pulse-slow {
+        animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+      .icon-hover {
+        transition: transform 0.3s ease;
+      }
+      .card-hover:hover .icon-hover {
+        transform: scale(1.15) rotate(5deg);
+      }
+    }
+  </style>
+</head>
+
+<body class="font-inter bg-gradient-to-br from-dark to-primary text-light min-h-screen overflow-x-hidden">
+  <!-- 顶部导航栏 -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-dark/80 backdrop-blur-md border-b border-white/10">
+    <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+      <!-- 品牌标识 -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-secondary to-accent flex items-center justify-center">
+          <i class="fa fa-car text-white text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-metallic to-white">AutoTech</h1>
+          <p class="text-xs text-gray-400">研发创新中心</p>
+        </div>
+      </div>
+      
+      <!-- 搜索栏 -->
+      <div class="hidden md:flex items-center bg-white/10 rounded-full px-4 py-2 flex-1 max-w-xl mx-8">
+        <i class="fa fa-search text-gray-400 mr-2"></i>
+        <input type="text" placeholder="搜索工具、文档或项目..." class="bg-transparent w-full focus:outline-none text-sm">
+      </div>
+      
+      <!-- 用户区域 -->
+      <div class="flex items-center space-x-5">
+        <button class="relative p-2 text-gray-400 hover:text-white transition-colors">
+          <i class="fa fa-bell text-lg"></i>
+          <span class="absolute top-1 right-1 w-2 h-2 bg-accent rounded-full"></span>
+        </button>
+        <div class="flex items-center space-x-2">
+          <img src="https://picsum.photos/id/1005/200/200" alt="用户头像" class="w-8 h-8 rounded-full border-2 border-secondary">
+          <span class="hidden md:inline text-sm font-medium">张工程师</span>
+          <i class="fa fa-angle-down text-gray-400"></i>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主内容区 -->
+  <div class="container mx-auto px-4 pt-20 pb-16 flex flex-col md:flex-row gap-6">
+    <!-- 侧边栏 -->
+    <aside class="w-full md:w-64 lg:w-72 shrink-0">
+      <div class="sticky top-20 bg-dark/50 rounded-xl p-5 border border-white/10">
+        <!-- 导航菜单 -->
+        <nav>
+          <ul class="space-y-1">
+            <li class="py-1">
+              <a href="#" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg bg-secondary/20 text-white border-l-4 border-secondary">
+                <i class="fa fa-dashboard w-5 text-center"></i>
+                <span>工作台概览</span>
+              </a>
+            </li>
+            <li class="py-1">
+              <a href="#" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-white/10 transition-colors">
+                <i class="fa fa-cogs w-5 text-center"></i>
+                <span>研发工具集</span>
+              </a>
+            </li>
+            <li class="py-1">
+              <a href="#" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-white/10 transition-colors">
+                <i class="fa fa-microchip w-5 text-center"></i>
+                <span>AI模型平台</span>
+              </a>
+            </li>
+            <li class="py-1">
+              <a href="#" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-white/10 transition-colors">
+                <i class="fa fa-flask w-5 text-center"></i>
+                <span>仿真测试</span>
+              </a>
+            </li>
+            <li class="py-1">
+              <a href="#" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-white/10 transition-colors">
+                <i class="fa fa-database w-5 text-center"></i>
+                <span>数据中心</span>
+              </a>
+            </li>
+            <li class="py-1">
+              <a href="#" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-white/10 transition-colors">
+                <i class="fa fa-tasks w-5 text-center"></i>
+                <span>项目管理</span>
+              </a>
+            </li>
+            <li class="py-1">
+              <a href="#" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-white/10 transition-colors">
+                <i class="fa fa-file-text w-5 text-center"></i>
+                <span>文档中心</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        
+        <!-- 快捷访问 -->
+        <div class="mt-8">
+          <h3 class="text-xs uppercase tracking-wider text-gray-500 mb-3 px-3">快捷访问</h3>
+          <div class="space-y-2">
+            <a href="#" class="flex items-center space-x-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+              <span class="w-6 h-6 rounded bg-blue-500/20 flex items-center justify-center text-blue-400 text-xs">
+                <i class="fa fa-code"></i>
+              </span>
+              <span class="text-sm">自动驾驶算法库</span>
+            </a>
+            <a href="#" class="flex items-center space-x-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+              <span class="w-6 h-6 rounded bg-green-500/20 flex items-center justify-center text-green-400 text-xs">
+                <i class="fa fa-line-chart"></i>
+              </span>
+              <span class="text-sm">性能测试报告</span>
+            </a>
+            <a href="#" class="flex items-center space-x-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+              <span class="w-6 h-6 rounded bg-purple-500/20 flex items-center justify-center text-purple-400 text-xs">
+                <i class="fa fa-users"></i>
+              </span>
+              <span class="text-sm">团队协作空间</span>
+            </a>
+          </div>
+        </div>
+        
+        <!-- 汽车研发进度 -->
+        <div class="mt-8 p-4 rounded-lg bg-gradient-to-br from-secondary/20 to-primary/30 border border-secondary/30">
+          <div class="flex justify-between items-center mb-3">
+            <h3 class="text-sm font-medium">研发进度追踪</h3>
+            <span class="text-xs bg-accent/20 text-accent px-2 py-0.5 rounded-full">78%</span>
+          </div>
+          <div class="w-full h-1.5 bg-white/10 rounded-full overflow-hidden mb-3">
+            <div class="h-full bg-gradient-to-r from-secondary to-accent rounded-full" style="width: 78%"></div>
+          </div>
+          <p class="text-xs text-gray-400">下一代电动车型研发计划</p>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- 主内容 -->
+    <main class="flex-1">
+      <!-- 欢迎区域 -->
+      <section class="mb-8">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+          <div>
+            <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-shadow">
+              欢迎回来，张工程师
+            </h2>
+            <p class="text-gray-400">今天是 <span class="text-metallic" id="current-date"></span>，这是您的研发工作台</p>
+          </div>
+          <div class="mt-4 md:mt-0 flex space-x-3">
+            <button class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium transition-colors flex items-center">
+              <i class="fa fa-plus mr-2"></i> 新建项目
+            </button>
+            <button class="px-4 py-2 bg-secondary hover:bg-secondary/90 rounded-lg text-sm font-medium transition-colors flex items-center">
+              <i class="fa fa-rocket mr-2"></i> 快速启动
+            </button>
+          </div>
+        </div>
+        
+        <!-- 数据概览卡片 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div class="bg-white/5 rounded-xl p-5 border border-white/10 card-hover">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-gray-400 text-sm">进行中项目</p>
+                <h3 class="text-2xl font-bold mt-1">12</h3>
+                <p class="text-green-400 text-xs mt-2 flex items-center">
+                  <i class="fa fa-arrow-up mr-1"></i> 较上周 +2
+                </p>
+              </div>
+              <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400">
+                <i class="fa fa-cubes"></i>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white/5 rounded-xl p-5 border border-white/10 card-hover">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-gray-400 text-sm">AI模型训练</p>
+                <h3 class="text-2xl font-bold mt-1">8</h3>
+                <p class="text-green-400 text-xs mt-2 flex items-center">
+                  <i class="fa fa-arrow-up mr-1"></i> 较上周 +3
+                </p>
+              </div>
+              <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400">
+                <i class="fa fa-microchip icon-hover"></i>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white/5 rounded-xl p-5 border border-white/10 card-hover">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-gray-400 text-sm">测试用例</p>
+                <h3 class="text-2xl font-bold mt-1">147</h3>
+                <p class="text-red-400 text-xs mt-2 flex items-center">
+                  <i class="fa fa-arrow-down mr-1"></i> 较上周 -5
+                </p>
+              </div>
+              <div class="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400">
+                <i class="fa fa-check-square-o icon-hover"></i>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white/5 rounded-xl p-5 border border-white/10 card-hover">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-gray-400 text-sm">待处理任务</p>
+                <h3 class="text-2xl font-bold mt-1">5</h3>
+                <p class="text-yellow-400 text-xs mt-2 flex items-center">
+                  <i class="fa fa-exclamation-circle mr-1"></i> 2项即将到期
+                </p>
+              </div>
+              <div class="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center text-yellow-400">
+                <i class="fa fa-tasks icon-hover"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- 研发数据可视化 -->
+      <section class="mb-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 bg-white/5 rounded-xl p-5 border border-white/10">
+          <div class="flex justify-between items-center mb-5">
+            <h3 class="font-semibold">研发项目进度</h3>
+            <div class="flex space-x-2">
+              <button class="text-xs px-3 py-1 bg-white/10 rounded-full hover:bg-white/20 transition-colors">月度</button>
+              <button class="text-xs px-3 py-1 bg-secondary/20 text-secondary rounded-full">季度</button>
+              <button class="text-xs px-3 py-1 bg-white/10 rounded-full hover:bg-white/20 transition-colors">年度</button>
+            </div>
+          </div>
+          <div class="h-64">
+            <canvas id="projectProgressChart"></canvas>
+          </div>
+        </div>
+        
+        <div class="bg-white/5 rounded-xl p-5 border border-white/10">
+          <div class="flex justify-between items-center mb-5">
+            <h3 class="font-semibold">AI模型性能</h3>
+            <button class="text-gray-400 hover:text-white">
+              <i class="fa fa-ellipsis-v"></i>
+            </button>
+          </div>
+          <div class="h-64">
+            <canvas id="aiModelPerformanceChart"></canvas>
+          </div>
+        </div>
+      </section>
+      
+      <!-- AI相关工具 -->
+      <section class="mb-8">
+        <div class="flex justify-between items-center mb-5">
+          <h3 class="text-xl font-bold">AI研发工具集</h3>
+          <a href="#" class="text-secondary hover:text-secondary/80 text-sm flex items-center">
+            查看全部 <i class="fa fa-angle-right ml-1"></i>
+          </a>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <!-- AI工具卡片1 -->
+          <div class="bg-gradient-to-br from-dark to-primary/50 rounded-xl overflow-hidden border border-white/10 card-hover">
+            <div class="p-5">
+              <div class="w-12 h-12 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400 mb-4">
+                <i class="fa fa-car icon-hover text-xl"></i>
+              </div>
+              <h4 class="text-lg font-semibold mb-2">自动驾驶                <i class="fa fa-bolt text-blue-400 mr-2"></i>
+                自动驾驶模型训练平台
+              </h4>
+              <p class="text-gray-400 text-sm mb-4">快速构建、训练和部署自动驾驶AI模型，支持多传感器数据融合</p>
+              <div class="flex justify-between items-center">
+                <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded-full flex items-center">
+                  <i class="fa fa-cogs mr-1"></i> 机器学习
+                </span>
+                <button class="text-sm text-secondary hover:text-white transition-colors">
+                  启动 <i class="fa fa-arrow-right ml-1"></i>
+                </button>
+              </div>
+            </div>
+            <div class="h-1 w-full bg-gradient-to-r from-blue-500 to-purple-500"></div>
+          </div>
+          
+          <!-- AI工具卡片2 -->
+          <div class="bg-gradient-to-br from-dark to-primary/50 rounded-xl overflow-hidden border border-white/10 card-hover">
+            <div class="p-5">
+              <div class="w-12 h-12 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400 mb-4">
+                <i class="fa fa-eye icon-hover text-xl"></i>
+              </div>
+              <h4 class="text-lg font-semibold mb-2">
+                <i class="fa fa-search text-green-400 mr-2"></i>
+                计算机视觉检测工具
+              </h4>
+              <p class="text-gray-400 text-sm mb-4">基于深度学习的图像识别系统，用于零部件缺陷检测和质量控制</p>
+              <div class="flex justify-between items-center">
+                <span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full flex items-center">
+                  <i class="fa fa-picture-o mr-1"></i> 计算机视觉
+                </span>
+                <button class="text-sm text-secondary hover:text-white transition-colors">
+                  启动 <i class="fa fa-arrow-right ml-1"></i>
+                </button>
+              </div>
+            </div>
+            <div class="h-1 w-full bg-gradient-to-r from-green-500 to-blue-500"></div>
+          </div>
+          
+          <!-- AI工具卡片3 -->
+          <div class="bg-gradient-to-br from-dark to-primary/50 rounded-xl overflow-hidden border border-white/10 card-hover">
+            <div class="p-5">
+              <div class="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400 mb-4">
+                <i class="fa fa-line-chart icon-hover text-xl"></i>
+              </div>
+              <h4 class="text-lg font-semibold mb-2">
+                <i class="fa fa-calendar-check-o text-purple-400 mr-2"></i>
+                预测性维护分析平台
+              </h4>
+              <p class="text-gray-400 text-sm mb-4">通过AI算法分析车辆传感器数据，预测潜在故障并提供维护建议</p>
+              <div class="flex justify-between items-center">
+                <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded-full flex items-center">
+                  <i class="fa fa-bar-chart mr-1"></i> 预测分析
+                </span>
+                <button class="text-sm text-secondary hover:text-white transition-colors">
+                  启动 <i class="fa fa-arrow-right ml-1"></i>
+                </button>
+              </div>
+            </div>
+            <div class="h-1 w-full bg-gradient-to-r from-purple-500 to-pink-500"></div>
+          </div>
+          
+          <!-- 新增AI工具卡片4 -->
+          <div class="bg-gradient-to-br from-dark to-primary/50 rounded-xl overflow-hidden border border-white/10 card-hover">
+            <div class="p-5">
+              <div class="w-12 h-12 rounded-lg bg-orange-500/20 flex items-center justify-center text-orange-400 mb-4">
+                <i class="fa fa-language icon-hover text-xl"></i>
+              </div>
+              <h4 class="text-lg font-semibold mb-2">
+                <i class="fa fa-comments text-orange-400 mr-2"></i>
+                智能语音交互开发平台
+              </h4>
+              <p class="text-gray-400 text-sm mb-4">开发车载语音助手和自然语言处理系统，优化人机交互体验</p>
+              <div class="flex justify-between items-center">
+                <span class="text-xs bg-orange-500/20 text-orange-400 px-2 py-1 rounded-full flex items-center">
+                  <i class="fa fa-microphone mr-1"></i> NLP
+                </span>
+                <button class="text-sm text-secondary hover:text-white transition-colors">
+                  启动 <i class="fa fa-arrow-right ml-1"></i>
+                </button>
+              </div>
+            </div>
+            <div class="h-1 w-full bg-gradient-to-r from-orange-500 to-red-500"></div>
+          </div>
+          
+          <!-- 新增AI工具卡片5 -->
+          <div class="bg-gradient-to-br from-dark to-primary/50 rounded-xl overflow-hidden border border-white/10 card-hover">
+            <div class="p-5">
+              <div class="w-12 h-12 rounded-lg bg-teal-500/20 flex items-center justify-center text-teal-400 mb-4">
+                <i class="fa fa-sitemap icon-hover text-xl"></i>
+              </div>
+              <h4 class="text-lg font-semibold mb-2">
+                <i class="fa fa-cubes text-teal-400 mr-2"></i>
+                智能供应链优化系统
+              </h4>
+              <p class="text-gray-400 text-sm mb-4">基于AI的供应链分析与优化工具，降低成本并提高生产效率</p>
+              <div class="flex justify-between items-center">
+                <span class="text-xs bg-teal-500/20 text-teal-400 px-2 py-1 rounded-full flex items-center">
+                  <i class="fa fa-truck mr-1"></i> 优化算法
+                </span>
+                <button class="text-sm text-secondary hover:text-white transition-colors">
+                  启动 <i class="fa fa-arrow-right ml-1"></i>
+                </button>
+              </div>
+            </div>
+            <div class="h-1 w-full bg-gradient-to-r from-teal-500 to-green-500"></div>
+          </div>
+          
+          <!-- 新增AI工具卡片6 -->
+          <div class="bg-gradient-to-br from-dark to-primary/50 rounded-xl overflow-hidden border border-white/10 card-hover">
+            <div class="p-5">
+              <div class="w-12 h-12 rounded-lg bg-yellow-500/20 flex items-center justify-center text-yellow-400 mb-4">
+                <i class="fa fa-lightbulb-o icon-hover text-xl"></i>
+              </div>
+              <h4 class="text-lg font-semibold mb-2">
+                <i class="fa fa-paint-brush text-yellow-400 mr-2"></i>
+                智能设计辅助工具
+              </h4>
+              <p class="text-gray-400 text-sm mb-4">AI驱动的汽车设计辅助系统，自动生成符合空气动力学的设计方案</p>
+              <div class="flex justify-between items-center">
+                <span class="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded-full flex items-center">
+                  <i class="fa fa-pencil mr-1"></i> 生成式AI
+                </span>
+                <button class="text-sm text-secondary hover:text-white transition-colors">
+                  启动 <i class="fa fa-arrow-right ml-1"></i>
+                </button>
+              </div>
+            </div>
+            <div class="h-1 w-full bg-gradient-to-r from-yellow-500 to-orange-500"></div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- 常用研发工具 -->
+      <section class="mb-8">
+        <div class="flex justify-between items-center mb-5">
+          <h3 class="text-xl font-bold">常用研发工具</h3>
+          <a href="#" class="text-secondary hover:text-secondary/80 text-sm flex items-center">
+            查看全部 <i class="fa fa-angle-right ml-1"></i>
+          </a>
+        </div>
+        
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <!-- 工具图标1 -->
+          <div class="bg-white/5 rounded-xl p-4 flex flex-col items-center justify-center text-center card-hover border border-white/10">
+            <div class="w-12 h-12 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400 mb-3">
+              <i class="fa fa-cubes icon-hover text-xl"></i>
+            </div>
+            <h4 class="text-sm font-medium">3D建模工具</h4>
+          </div>
+          
+          <!-- 工具图标2 -->
+          <div class="bg-white/5 rounded-xl p-4 flex flex-col items-center justify-center text-center card-hover border border-white/10">
+            <div class="w-12 h-12 rounded-lg bg-red-500/20 flex items-center justify-center text-red-400 mb-3">
+              <i class="fa fa-car icon-hover text-xl"></i>
+            </div>
+            <h4 class="text-sm font-medium">车辆仿真平台</h4>
+          </div>
+          
+          <!-- 工具图标3 -->
+          <div class="bg-white/5 rounded-xl p-4 flex flex-col items-center justify-center text-center card-hover border border-white/10">
+            <div class="w-12 h-12 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400 mb-3">
+              <i class="fa fa-bolt icon-hover text-xl"></i>
+            </div>
+            <h4 class="text-sm font-medium">电池性能分析</h4>
+          </div>
+          
+          <!-- 工具图标4 -->
+          <div class="bg-white/5 rounded-xl p-4 flex flex-col items-center justify-center text-center card-hover border border-white/10">
+            <div class="w-12 h-12 rounded-lg bg-yellow-500/20 flex items-center justify-center text-yellow-400 mb-3">
+              <i class="fa fa-wind icon-hover text-xl"></i>
+            </div>
+            <h4 class="text-sm font-medium">风阻模拟工具</h4>
+          </div>
+          
+          <!-- 工具图标5 -->
+          <div class="bg-white/5 rounded-xl p-4 flex flex-col items-center justify-center text-center card-hover border border-white/10">
+            <div class="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400 mb-3">
+              <i class="fa fa-code-fork icon-hover text-xl"></i>
+            </div>
+            <h4 class="text-sm font-medium">代码仓库</h4>
+          </div>
+          
+          <!-- 工具图标6 -->
+          <div class="bg-white/5 rounded-xl p-4 flex flex-col items-center justify-center text-center card-hover border border-white/10">
+            <div class="w-12 h-12 rounded-lg bg-teal-500/20 flex items-center justify-center text-teal-400 mb-3">
+              <i class="fa fa-file-text-o icon-hover text-xl"></i>
+            </div>
+            <h4 class="text-sm font-medium">研发文档管理</h4>
+          </div>
+          
+          <!-- 新增工具图标7 -->
+          <div class="bg-white/5 rounded-xl p-4 flex flex-col items-center justify-center text-center card-hover border border-white/10">
+            <div class="w-12 h-12 rounded-lg bg-indigo-500/20 flex items-center justify-center text-indigo-400 mb-3">
+              <i class="fa fa-tachometer icon-hover text-xl"></i>
+            </div>
+            <h4 class="text-sm font-medium">动力性能测试</h4>
+          </div>
+          
+          <!-- 新增工具图标8 -->
+          <div class="bg-white/5 rounded-xl p-4 flex flex-col items-center justify-center text-center card-hover border border-white/10">
+            <div class="w-12 h-12 rounded-lg bg-pink-500/20 flex items-center justify-center text-pink-400 mb-3">
+              <i class="fa fa-area-chart icon-hover text-xl"></i>
+            </div>
+            <h4 class="text-sm font-medium">能耗分析工具</h4>
+          </div>
+          
+          <!-- 新增工具图标9 -->
+          <div class="bg-white/5 rounded-xl p-4 flex flex-col items-center justify-center text-center card-hover border border-white/10">
+            <div class="w-12 h-12 rounded-lg bg-gray-500/20 flex items-center justify-center text-gray-400 mb-3">
+              <i class="fa fa-shield icon-hover text-xl"></i>
+            </div>
+            <h4 class="text-sm font-medium">安全性能模拟</h4>
+          </div>
+          
+          <!-- 新增工具图标10 -->
+          <div class="bg-white/5 rounded-xl p-4 flex flex-col items-center justify-center text-center card-hover border border-white/10">
+            <div class="w-12 h-12 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-400 mb-3">
+              <i class="fa fa-microchip icon-hover text-xl"></i>
+            </div>
+            <h4 class="text-sm font-medium">ECU编程工具</h4>
+          </div>
+          
+          <!-- 新增工具图标11 -->
+          <div class="bg-white/5 rounded-xl p-4 flex flex-col items-center justify-center text-center card-hover border border-white/10">
+            <div class="w-12 h-12 rounded-lg bg-red-500/20 flex items-center justify-center text-red-400 mb-3">
+              <i class="fa fa-fire icon-hover text-xl"></i>
+            </div>
+            <h4 class="text-sm font-medium">热管理分析</h4>
+          </div>
+          
+          <!-- 新增工具图标12 -->
+          <div class="bg-white/5 rounded-xl p-4 flex flex-col items-center justify-center text-center card-hover border border-white/10">
+            <div class="w-12 h-12 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400 mb-3">
+              <i class="fa fa-leaf icon-hover text-xl"></i>
+            </div>
+            <h4 class="text-sm font-medium">环保合规检测</h4>
+          </div>
+        </div>
+      </section>
+      
+      <!-- 汽车研发项目与资源 -->
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- 进行中项目 -->
+        <div class="lg:col-span-2 bg-white/5 rounded-xl p-5 border border-white/10">
+          <div class="flex justify-between items-center mb-5">
+            <h3 class="font-semibold">进行中研发项目</h3>
+            <a href="#" class="text-secondary hover:text-secondary/80 text-sm">查看全部</a>
+          </div>
+          
+          <div class="space-y-4">
+            <!-- 项目1 -->
+            <div class="p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h4 class="font-medium flex items-center">
+                    <i class="fa fa-battery-full text-green-400 mr-2"></i>
+                    下一代电动汽车平台研发
+                  </h4>
+                  <p class="text-gray-400 text-sm mt-1">电池技术优化与电驱系统集成</p>
+                </div>
+                <span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full">进行中</span>
+              </div>
+              <div class="mt-3 flex items-center justify-between">
+                <div class="w-full bg-white/10 rounded-full h-1.5 mr-3">
+                  <div class="bg-gradient-to-r from-green-500 to-blue-500 h-1.5 rounded-full" style="width: 68%"></div>
+                </div>
+                <span class="text-sm font-medium">68%</span>
+              </div>
+              <div class="mt-3 flex justify-between items-center text-xs text-gray-400">
+                <span>截止日期: 2023/12/15</span>
+                <span>团队: 电动驱动组</span>
+              </div>
+            </div>
+            
+            <!-- 项目2 -->
+            <div class="p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h4 class="font-medium flex items-center">
+                    <i class="fa fa-microchip text-blue-400 mr-2"></i>
+                    自动驾驶算法V2.0开发
+                  </h4>
+                  <p class="text-gray-400 text-sm mt-1">感知系统优化与决策逻辑升级</p>
+                </div>
+                <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded-full">进行中</span>
+              </div>
+              <div class="mt-3 flex items-center justify-between">
+                <div class="w-full bg-white/10 rounded-full h-1.5 mr-3">
+                  <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-1.5 rounded-full" style="width: 45%"></div>
+                </div>
+                <span class="text-sm font-medium">45%</span>
+              </div>
+              <div class="mt-3 flex justify-between items-center text-xs text-gray-400">
+                <span>截止日期: 2024/02/28</span>
+                <span>团队: AI算法组</span>
+              </div>
+            </div>
+            
+            <!-- 项目3 -->
+            <div class="p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h4 class="font-medium flex items-center">
+                    <i class="fa fa-cubes text-yellow-400 mr-2"></i>
+                    轻量化车身材料测试
+                  </h4>
+                  <p class="text-gray-400 text-sm mt-1">新型复合材料强度与耐久性验证</p>
+                </div>
+                <span class="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded-full">进行中</span>
+              </div>
+              <div class="mt-3 flex items-center justify-between">
+                <div class="w-full bg-white/10 rounded-full h-1.5 mr-3">
+                  <div class="bg-gradient-to-r from-yellow-500 to-orange-500 h-1.5 rounded-full" style="width: 82%"></div>
+                </div>
+                <span class="text-sm font-medium">82%</span>
+              </div>
+              <div class="mt-3 flex justify-between items-center text-xs text-gray-400">
+                <span>截止日期: 2023/11/30</span>
+                <span>团队: 材料研发组</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 研发资源与最新动态 -->
+        <div class="bg-white/5 rounded-xl p-5 border border-white/10">
+          <div class="flex justify-between items-center mb-5">
+            <h3 class="font-semibold">研发资源与动态</h3>
+            <button class="text-gray-400 hover:text-white">
+              <i class="fa fa-refresh"></i>
+            </button>
+          </div>
+          
+          <!-- 汽车SVG图形装饰 -->
+          <div class="mb-6 relative h-32 w-full">
+            <svg viewBox="0 0 300 100" class="w-full h-full">
+              <path d="M30,50 C50,30 70,30 90,50 C110,70 130,70 150,50 C170,30 190,30 210,50 C230,70 250,70 270,50" 
+                    stroke="#1A73E8" stroke-width="2" fill="none" class="car-line" />
+              <circle cx="50" cy="50" r="8" fill="#1A73E8" class="pulse-slow" />
+              <circle cx="250" cy="50" r="8" fill="#1A73E8" class="pulse-slow" />
+            </svg>
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-dark/80 px-3 py-1 rounded-full text-xs">
+              研发进度更新
+            </div>
+          </div>
+          
+          <div class="space-y-4 max-h-60 overflow-y-auto gradient-mask pr-1">
+            <!-- 动态1 -->
+            <div class="flex space-x-3 pb-3 border-b border-white/5">
+              <div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0">
+                <i class="fa fa-file-text-o"></i>
+              </div>
+              <div>
+                <p class="text-sm">新发布《自动驾驶安全测试规范v3.0》</p>
+                <p class="text-xs text-gray-400 mt-1">2小时前</p>
+              </div>
+            </div>
+            
+            <!-- 动态2 -->
+            <div class="flex space-x-3 pb-3 border-b border-white/5">
+              <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 flex-shrink-0">
+                <i class="fa fa-check-circle"></i>
+              </div>
+              <div>
+                <p class="text-sm">电池材料测试数据集已更新</p>
+                <p class="text-xs text-gray-400 mt-1">昨天</p>
+              </div>
+            </div>
+            
+            <!-- 动态3 -->
+            <div class="flex space-x-3 pb-3 border-b border-white/5">
+              <div class="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 flex-shrink-0">
+                <i class="fa fa-users"></i>
+              </div>
+              <div>
+                <p class="text-sm">AI模型训练工作坊将于周五举行</p>
+                <p class="text-xs text-gray-400 mt-1">2天前</p>
+              </div>
+            </div>
+            
+            <!-- 动态4 -->
+            <div class="flex space-x-3">
+              <div class="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center text-red-400 flex-shrink-0">
+                <i class="fa fa-exclamation-triangle"></i>
+              </div>
+              <div>
+                <p class="text-sm">风洞测试设备维护通知 (11月20日)</p>
+                <p class="text-xs text-gray-400 mt-1">3天前</p>
+              </div>
+            </div>
+          </div>
+          
+          <button class="w-full mt-5 py-2 border border-white/20 rounded-lg text-sm hover:bg-white/10 transition-colors flex items-center justify-center">
+            <i class="fa fa-history mr-2"></i> 查看所有动态
+          </button>
+        </div>
+      </section>
+    </main>
+  </div>
+  
+  <!-- 页脚 -->
+  <footer class="bg-dark/50 border-t border-white/10 py-6">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="flex items-center space-x-3 mb-4 md:mb-0">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-secondary to-accent flex items-center justify-center">
+            <i class="fa fa-car text-white text-sm"></i>
+          </div>
+          <span class="text-sm text-gray-400">AutoTech 研发工作台 © 2023</span>
+        </div>
+        
+        <div class="flex space-x-6">
+          <a href="#" class="text-gray-400 hover:text-white text-sm flex items-center">
+            <i class="fa fa-question-circle mr-1"></i> 帮助中心
+          </a>
+          <a href="#" class="text-gray-400 hover:text-white text-sm flex items-center">
+            <i class="fa fa-book mr-1"></i> 研发资源库
+          </a>
+          <a href="#" class="text-gray-400 hover:text-white text-sm flex items-center">
+            <i class="fa fa-envelope mr-1"></i> 联系支持
+          </a>
+          <a href="#" class="text-gray-400 hover:text-white text-sm flex items-center">
+            <i class="fa fa-lock mr-1"></i> 隐私政策
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // 设置当前日期
+    document.addEventListener('DOMContentLoaded', function() {
+      const dateOptions = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+      const currentDate = new Date().toLocaleDateString('zh-CN', dateOptions);
+      document.getElementById('current-date').textContent = currentDate;
+      
+      // 项目进度图表
+      const projectCtx = document.getElementById('projectProgressChart').getContext('2d');
+      const projectChart = new Chart(projectCtx, {
+        type: 'line',
+        data: {
+          labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+          datasets: [
+            {
+              label: '电动平台',
+              data: [15, 30, 45, 52, 60, 68],
+              borderColor: '#1A73E8',
+              backgroundColor: 'rgba(26, 115, 232, 0.1)',
+              tension: 0.4,
+              fill: true
+            },
+            {
+              label: '自动驾驶',
+              data: [10, 18, 25, 32, 38, 45],
+              borderColor: '#9C27B0',
+              backgroundColor: 'rgba(156, 39, 176, 0.1)',
+              tension: 0.4,
+              fill: true
+            },
+            {
+              label: '材料研发',
+              data: [20, 35, 50, 65, 75, 82],
+              borderColor: '#FFC107',
+              backgroundColor: 'rgba(255, 193, 7, 0.1)',
+              tension: 0.4,
+              fill: true
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                color: '#F5F7FA'
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              ticks: {
+                color: '#888'
+              },
+              grid: {
+                color: 'rgba(255, 255, 255, 0.05)'
+              }
+            },
+            x: {
+              ticks: {
+                color: '#888'
+              },
+              grid: {
+                color: 'rgba(255, 255, 255, 0.05)'
+              }
+            }
+          }
+        }
+      });
+      
+      // AI模型性能图表
+      const aiCtx = document.getElementById('aiModelPerformanceChart').getContext('2d');
+      const aiChart = new Chart(aiCtx, {
+        type: 'radar',
+        data: {
+          labels: ['准确率', '响应速度', '鲁棒性', '能耗', '兼容性'],
+          datasets: [
+            {
+              label: '当前模型',
+              data: [85, 78, 82, 65, 90],
+              backgroundColor: 'rgba(26, 115, 232, 0.2)',
+              borderColor: '#1A73E8',
+              pointBackgroundColor: '#1A73E8'
+            },
+            {
+              label: '目标指标',
+              data: [95, 90, 92, 80, 95],
+              backgroundColor: 'rgba(230, 57, 70, 0.2)',
+              borderColor: '#E63946',
+              pointBackgroundColor: '#E63946',
+              borderDash: [5, 5]
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            r: {
+              angleLines: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              },
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              },
+              pointLabels: {
+                color: '#F5F7FA'
+              },
+              ticks: {
+                color: '#888',
+                backdropColor: 'transparent'
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                color: '#F5F7FA'
+              }
+            }
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
